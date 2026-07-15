@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO / social — edit these to your own details -->
+  <title>Jeffrin Goldwin — Senior DevOps Engineer</title>
+  <meta name="description" content="Portfolio of Jeffrin Goldwin — Senior DevOps Engineer building secure, scalable cloud infrastructure and full-stack systems across AWS and Azure." />
+  <meta name="author" content="Jeffrin Goldwin" />
+  <meta name="theme-color" content="#f4f0e6" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Jeffrin Goldwin — Senior DevOps Engineer" />
+  <meta property="og:description" content="Cloud infrastructure, DevOps, and full-stack engineering across AWS and Azure by Jeffrin Goldwin." />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="src/styles.css" />
+
+  <!-- React, ReactDOM and Framer Motion are bundled into app.bundle.js (built from
+       src/App.jsx by build.ps1), so there are NO third-party module requests at runtime.
+       Only `@data` stays external, so content edits (src/data.js) need no rebuild. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "@data": "./src/data.js"
+    }
+  }
+  </script>
+
+  <!-- Fetch the bundle + content in parallel. -->
+  <link rel="modulepreload" href="./src/app.bundle.js" />
+  <link rel="modulepreload" href="./src/data.js" />
+</head>
+<body>
+  <div id="root"></div>
+
+  <noscript>
+    <div style="max-width:640px;margin:80px auto;padding:24px;font-family:sans-serif;color:#e9ecf4;text-align:center">
+      This portfolio needs JavaScript enabled to display. Please enable it, or view my work on GitHub.
+    </div>
+  </noscript>
+
+  <!-- Self-contained bundle (React + Framer + app, built from src/App.jsx by
+       build.ps1 — no in-browser Babel, no CDN modules). See README "Editing the app". -->
+  <script type="module" src="src/app.bundle.js"></script>
+</body>
+</html>
