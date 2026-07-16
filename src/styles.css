@@ -249,8 +249,12 @@ section { padding: 96px 0; position: relative; }
 
 /* ---------- Cards / grids --------------------------------------------------- */
 .grid { display: grid; gap: 20px; }
-.grid.projects { grid-template-columns: repeat(2, 1fr); }
-.grid.certs { grid-template-columns: repeat(3, 1fr); }
+/* Experience reads as a chronological list, so one full-width column per role —
+   a 2-col grid left a lone trailing card stranded at half width. */
+.grid.projects { grid-template-columns: 1fr; }
+/* auto-fit so a short list sits left-aligned at a natural card size rather than
+   stretching or stranding cards in empty columns */
+.grid.certs { grid-template-columns: repeat(auto-fit, minmax(280px, 320px)); }
 .grid.blog { grid-template-columns: repeat(3, 1fr); }
 
 .card {
@@ -260,7 +264,10 @@ section { padding: 96px 0; position: relative; }
   transition: border-color 0.25s, transform 0.25s, background 0.25s, box-shadow 0.25s;
 }
 .card::before {
-  content: ""; position: absolute; inset: 0; border-radius: var(--radius); padding: 1px;
+  /* Decorative hover border overlaying the whole card — must not eat clicks on
+     the card's own buttons and links. */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  border-radius: var(--radius); padding: 1px;
   background: var(--accent-grad); opacity: 0;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude; transition: opacity 0.3s;
@@ -280,6 +287,29 @@ section { padding: 96px 0; position: relative; }
 .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
 .tag { font-family: var(--mono); font-size: 0.74rem; color: var(--accent-ink); padding: 4px 10px; border-radius: 8px; background: rgba(184, 106, 67, 0.07); border: 1px solid rgba(184, 106, 67, 0.16); }
 .featured-flag { font-family: var(--mono); font-size: 0.72rem; color: var(--accent-ink); border: 1px solid rgba(138, 74, 36, 0.22); background: rgba(211, 160, 103, 0.10); padding: 3px 10px; border-radius: 100px; }
+
+/* expandable experience cards */
+.exp-card.is-expandable { cursor: default; }
+/* height animates from 0, so the bullets must clip while collapsing */
+.exp-details { overflow: hidden; }
+.exp-details ul { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 10px; }
+.exp-details li {
+  position: relative; padding-left: 18px; color: var(--muted);
+  font-size: 0.92rem; line-height: 1.6;
+}
+.exp-details li::before {
+  content: "▸"; position: absolute; left: 0; top: 0;
+  color: var(--accent); font-size: 0.8rem; line-height: 1.9;
+}
+.exp-toggle {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 16px;
+  padding: 0; border: 0; background: none; cursor: pointer;
+  font-family: var(--mono); font-size: 0.8rem; color: var(--accent-ink);
+  transition: opacity 0.2s;
+}
+.exp-toggle:hover { opacity: 0.7; }
+.exp-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+.exp-chevron { display: inline-flex; }
 
 /* cert cards */
 .cert-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--surface-2); border: 1px solid var(--border); color: var(--accent); margin-bottom: 16px; }
@@ -315,7 +345,8 @@ footer { border-top: 1px solid var(--border); padding: 30px 0; }
   .hero-grid { grid-template-columns: 1fr; gap: 44px; }
   .avatar-wrap { order: -1; }
   .about-grid { grid-template-columns: 1fr; }
-  .grid.certs, .grid.blog { grid-template-columns: repeat(2, 1fr); }
+  /* .grid.certs is auto-fit and handles this range itself */
+  .grid.blog { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 640px) {
   section { padding: 72px 0; }
