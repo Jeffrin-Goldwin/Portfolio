@@ -1,2 +1,6 @@
 .tools/
 node_modules/
+
+# Build artifact — generated from src/App.jsx by build.ps1 (local) or CI.
+# Not committed: App.jsx is the single source of truth. CI rebuilds it on deploy.
+src/app.bundle.js
