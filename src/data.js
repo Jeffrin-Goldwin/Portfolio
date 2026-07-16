@@ -12,7 +12,7 @@ export const profile = {
   tagline: "I architect secure, scalable cloud infrastructure and ship full-stack systems end to end.",
   // A 2–3 sentence bio for the About section.
   about:
-    "Senior Software Engineer with hands-on experience designing and delivering enterprise cloud " +
+    "Senior DevOps Engineer with hands-on experience designing and delivering enterprise cloud " +
     "infrastructure, full-stack applications, and data platforms across AWS and Azure. " +
     "Skilled in DevOps, Infrastructure as Code, CI/CD automation, and cloud-native architecture " +
     "with a track record of building secure, scalable systems end to end.",
@@ -22,7 +22,8 @@ export const profile = {
   // and it appears in the hero. If the file is missing, a monogram shows instead.
   photo: "assets/profile.jpg",
   // Resume: put a PDF at assets/resume.pdf, or set to null to hide the button.
-  resume: "assets/resume.pdf",
+  // Hidden for now — set back to "assets/resume.pdf" to show the button again.
+  resume: null,
   // Small stat chips shown in the hero. Add/remove freely.
   stats: [
     { value: "AWS + Azure", label: "Multi-cloud" },
@@ -45,8 +46,11 @@ export const socials = [
 
 // ---------------------------------------------------------------------------
 //  EXPERIENCE  (your roles — shown as cards under the "Experience" section)
-//  `featured: true` gives the card a wider, highlighted treatment.
-//  `badge` overrides the corner flag text (defaults to "featured").
+//  `featured: true` highlights the card; `badge` overrides the corner flag
+//  text (defaults to "featured").
+//  `description` is the summary always shown on the card. `highlights` is the
+//  bullet list revealed when the card is expanded — omit it and the card
+//  simply isn't expandable.
 //  When you have public repos to show, add `repo` / `demo` URLs to a card.
 // ---------------------------------------------------------------------------
 export const projects = [
@@ -56,6 +60,16 @@ export const projects = [
     period: "Jan 2024 — Present",
     description:
       "Design and deliver cloud-native full-stack applications and enterprise cloud infrastructure across AWS and Azure — reusable Terraform modules for networking, compute, storage and security, multi-tenant SSO with Azure Entra ID / OAuth2 / OpenID Connect, and hardened CI/CD pipelines (GitHub Actions, Azure DevOps, Jenkins) with SonarQube, Trivy, secret scanning and coverage gates. Also build scalable data platforms with Microsoft Fabric, Databricks, Snowflake and dbt.",
+    highlights: [
+      "Designed and delivered cloud-native full-stack applications using Next.js, NestJS, TypeScript, PostgreSQL and Prisma across multiple client engagements.",
+      "Built and maintained CI/CD pipelines using GitHub Actions, Azure DevOps and Jenkins, incorporating SonarQube scanning, Trivy, secret scanning, migration dry-runs and test coverage gates.",
+      "Implemented enterprise authentication using Azure Entra ID, OAuth2 and OpenID Connect, including multi-tenant SSO across multiple Azure Active Directory tenants.",
+      "Designed and deployed cloud infrastructure on AWS and Azure using reusable Terraform modules, covering networking, compute, storage and security across multiple environments.",
+      "Implemented AWS governance controls across multi-account AWS Organizations using Service Control Policies (SCPs), Tag Policies and AWS Config for tag enforcement and compliance.",
+      "Built scalable data engineering pipelines using Microsoft Fabric, Databricks, Snowflake and dbt, including on-premises data gateway integration and medallion architecture design.",
+      "Automated cloud operational workflows using Azure Logic Apps, reducing manual effort for Fabric capacity management and infrastructure lifecycle tasks.",
+      "Containerized applications using Docker and designed deployment strategies for Kubernetes-based environments.",
+    ],
     tags: ["AWS", "Azure", "Terraform", "CI/CD", "Kubernetes", "Data Engineering"],
     repo: null,
     demo: null,
@@ -68,6 +82,10 @@ export const projects = [
     period: "Dec 2023 — Jan 2024",
     description:
       "Performed web application security assessments, vulnerability analysis and penetration testing following industry-standard methodologies. Documented findings and remediation recommendations for identified vulnerabilities.",
+    highlights: [
+      "Performed web application security assessments, vulnerability analysis and penetration testing following industry-standard methodologies.",
+      "Documented findings and remediation recommendations for identified security vulnerabilities.",
+    ],
     tags: ["Security", "Pen Testing", "Web AppSec"],
     repo: null,
     demo: null,

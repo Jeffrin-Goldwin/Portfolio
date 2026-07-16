@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import {
   profile,
   skills,
@@ -67,6 +67,12 @@ const Icon = ({ name, size = 18 }) => {
       return (
         <svg {...p} width={28} height={28}>
           <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
+        </svg>
+      );
+    case "chevron":
+      return (
+        <svg {...p} width={16} height={16}>
+          <path d="m6 9 6 6 6-6" />
         </svg>
       );
     case "cert":
@@ -281,7 +287,6 @@ function About() {
             <div className="info-row"><span className="k">name</span><span>{profile.name}</span></div>
             <div className="info-row"><span className="k">role</span><span>{profile.role}</span></div>
             <div className="info-row"><span className="k">location</span><span>{profile.location}</span></div>
-            <div className="info-row"><span className="k">email</span><a href={`mailto:${profile.email}`} className="grad">{profile.email}</a></div>
           </Reveal>
         </div>
       </div>
@@ -290,6 +295,79 @@ function About() {
 }
 
 /* ------------------------------------------------------------- projects ---- */
+function ExperienceCard({ p }) {
+  const [open, setOpen] = useState(false);
+  const expandable = Array.isArray(p.highlights) && p.highlights.length > 0;
+
+  return (
+    <motion.article
+      className={"card exp-card" + (expandable ? " is-expandable" : "") + (open ? " is-open" : "")}
+      variants={fadeUp}
+      // Skip the hover lift while expanded — a tall open panel shouldn't float.
+      whileHover={open ? undefined : { y: -4 }}
+      transition={{ type: "spring", stiffness: 300, damping: 22 }}
+    >
+      <div className="card-top">
+        <span className="folder"><Icon name="folder" /></span>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          {(p.badge || p.featured) && <span className="featured-flag">{p.badge || "featured"}</span>}
+          <div className="card-links">
+            {p.repo && <a href={p.repo} target="_blank" rel="noreferrer" aria-label="Repository"><Icon name="github" /></a>}
+            {p.demo && <a href={p.demo} target="_blank" rel="noreferrer" aria-label="Live demo"><Icon name="external" /></a>}
+          </div>
+        </div>
+      </div>
+      <h3>{p.title}</h3>
+      {(p.org || p.period) && (
+        <div className="card-meta">
+          {p.org}{p.org && p.period ? " · " : ""}{p.period}
+        </div>
+      )}
+      <p>{p.description}</p>
+
+      {expandable && (
+        <>
+          <AnimatePresence initial={false}>
+            {open && (
+              <motion.div
+                className="exp-details"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <ul>
+                  {p.highlights.map((h, i) => <li key={i}>{h}</li>)}
+                </ul>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <button
+            type="button"
+            className="exp-toggle"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+          >
+            <span>{open ? "Hide details" : "What I did here"}</span>
+            <motion.span
+              className="exp-chevron"
+              animate={{ rotate: open ? 180 : 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <Icon name="chevron" />
+            </motion.span>
+          </button>
+        </>
+      )}
+
+      <div className="tags">
+        {p.tags.map((t) => <span className="tag" key={t}>{t}</span>)}
+      </div>
+    </motion.article>
+  );
+}
+
 function Projects() {
   return (
     <section id="projects">
@@ -307,36 +385,7 @@ function Projects() {
           whileInView="show"
           viewport={{ once: true, amount: 0.1 }}
         >
-          {projects.map((p) => (
-            <motion.article
-              key={p.title}
-              className={"card" + (p.featured ? " span-2" : "")}
-              variants={fadeUp}
-              whileHover={{ y: -6 }}
-              transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            >
-              <div className="card-top">
-                <span className="folder"><Icon name="folder" /></span>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  {(p.badge || p.featured) && <span className="featured-flag">{p.badge || "featured"}</span>}
-                  <div className="card-links">
-                    {p.repo && <a href={p.repo} target="_blank" rel="noreferrer" aria-label="Repository"><Icon name="github" /></a>}
-                    {p.demo && <a href={p.demo} target="_blank" rel="noreferrer" aria-label="Live demo"><Icon name="external" /></a>}
-                  </div>
-                </div>
-              </div>
-              <h3>{p.title}</h3>
-              {(p.org || p.period) && (
-                <div className="card-meta">
-                  {p.org}{p.org && p.period ? " · " : ""}{p.period}
-                </div>
-              )}
-              <p>{p.description}</p>
-              <div className="tags">
-                {p.tags.map((t) => <span className="tag" key={t}>{t}</span>)}
-              </div>
-            </motion.article>
-          ))}
+          {projects.map((p) => <ExperienceCard key={p.title} p={p} />)}
         </motion.div>
       </div>
     </section>
@@ -351,8 +400,7 @@ function Certifications() {
         <SectionHead
           n="03"
           label="certifications"
-          title="Credentials & certs"
-          subtitle="Verified certifications and the skills behind them."
+          title="What I'm certified in"
         />
         <motion.div
           className="grid certs"

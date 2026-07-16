@@ -12,6 +12,7 @@ Replace the placeholders throughout:
 | `YOUR-BUCKET`          | the S3 bucket serving the site                       |
 | `DISTRIBUTION_ID`      | the CloudFront distribution ID (e.g. `E123ABC456`)  |
 | `REGION`               | bucket region (e.g. `ap-south-1`)                   |
+| `OWNER_ID` / `REPO_ID` | numeric GitHub owner and repo IDs — see step 2       |
 
 ---
 
@@ -42,7 +43,7 @@ repo's* `production` environment only — nothing else can assume it):
       "Condition": {
         "StringEquals": {
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-          "token.actions.githubusercontent.com:sub": "repo:Jeffrin-Goldwin/Portfolio:environment:production"
+          "token.actions.githubusercontent.com:sub": "repo:Jeffrin-Goldwin@OWNER_ID/Portfolio@REPO_ID:environment:production"
         }
       }
     }
@@ -50,8 +51,24 @@ repo's* `production` environment only — nothing else can assume it):
 }
 ```
 
-Name it e.g. `portfolio-deploy`. Then attach this **least-privilege permissions policy** (create
-it inline or as a managed policy):
+> **The `@OWNER_ID` / `@REPO_ID` suffixes are required.** This repo emits OIDC subjects in
+> GitHub's **immutable ID** format, so the `sub` claim is
+> `repo:OWNER@<owner-id>/REPO@<repo-id>:environment:production` — *not* the plain-name form shown
+> in most tutorials. A plain-name `sub` fails with a misleading
+> `Not authorized to perform sts:AssumeRoleWithWebIdentity`.
+>
+> To read the exact `sub` your workflow sends, trigger a deploy and check CloudTrail:
+> ```bash
+> aws cloudtrail lookup-events \
+>   --lookup-attributes AttributeKey=EventName,AttributeValue=AssumeRoleWithWebIdentity \
+>   --max-results 1 --region REGION \
+>   --query 'Events[0].CloudTrailEvent' --output text
+> ```
+> The `userIdentity.userName` field is the literal subject — paste it into the policy verbatim.
+> The IDs are stable across renames, so this is *stronger* than matching on names.
+
+Name the role `deploy-portfolio` (this is what the `AWS_ROLE_ARN` secret must point at). Then
+attach this **least-privilege permissions policy** (create it inline or as a managed policy):
 
 ```json
 {
@@ -79,7 +96,7 @@ it inline or as a managed policy):
 }
 ```
 
-Copy the finished **Role ARN** (`arn:aws:iam::ACCOUNT_ID:role/portfolio-deploy`).
+Copy the finished **Role ARN** (`arn:aws:iam::ACCOUNT_ID:role/deploy-portfolio`).
 
 ## 3. Create the `production` environment in GitHub
 
@@ -95,8 +112,13 @@ Repo → **Settings** → **Secrets and variables** → **Actions**:
 
 **Variables** (tab: Variables):
 - `AWS_REGION` = `REGION`
-- `S3_BUCKET` = `YOUR-BUCKET`
+- `S3_BUCKET` = `YOUR-BUCKET` — bare bucket name, no `s3://` prefix, no trailing slash
 - `CLOUDFRONT_DISTRIBUTION_ID` = `DISTRIBUTION_ID`
+
+> The two tabs are **not** interchangeable: the workflow reads `secrets.AWS_ROLE_ARN` but
+> `vars.AWS_REGION` / `vars.S3_BUCKET` / `vars.CLOUDFRONT_DISTRIBUTION_ID`. A value stored in the
+> wrong tab resolves to an empty string instead of erroring. If you scope any of them to an
+> environment rather than the repo, it must be the `production` environment.
 
 ## 5. Done
 
@@ -106,6 +128,7 @@ syncs to S3, and invalidates CloudFront. Pull requests run **CI only** — they 
 > Security notes
 > - No AWS keys are ever stored in GitHub. Credentials are minted per-run and expire in ~1 hour.
 > - The trust policy pins the exact repo **and** the `production` environment, so a fork or another
->   repo cannot assume the role.
+>   repo cannot assume the role. Because it matches on immutable numeric IDs, deleting the repo and
+>   recreating one with the same name would *not* inherit access.
 > - The permissions policy grants only S3 object writes on this one bucket and invalidation on this
 >   one distribution.
