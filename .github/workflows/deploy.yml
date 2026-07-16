@@ -1,0 +1,92 @@
+name: CI / CD
+
+# CI  (build): runs on every push and PR — fails the check if the app won't build.
+# CD (deploy): runs only on push to main — syncs to S3 and invalidates CloudFront,
+#              authenticating to AWS via short-lived OIDC credentials (no stored keys).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Least privilege. `id-token: write` is required for GitHub → AWS OIDC.
+permissions:
+  contents: read
+  id-token: write
+
+# Never run two deploys at once; cancel superseded in-progress runs.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (CI)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install build dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build bundle (fails on any build error)
+        run: npm run build
+
+      - name: Upload built bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-bundle
+          path: src/app.bundle.js
+          retention-days: 1
+          if-no-files-found: error
+
+  deploy:
+    name: Deploy (CD)
+    needs: build
+    # Deploy only for pushes to main — PRs get CI only, never a deploy.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      # Bring in the exact bundle that the build job produced and verified.
+      - name: Download built bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: app-bundle
+          path: src
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Sync site to S3
+        run: |
+          aws s3 sync . "s3://${{ vars.S3_BUCKET }}" \
+            --delete \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude "node_modules/*" \
+            --exclude ".tools/*" \
+            --exclude "src/App.jsx" \
+            --exclude "*.ps1" \
+            --exclude "*.md" \
+            --exclude "package.json" \
+            --exclude "package-lock.json" \
+            --exclude ".gitignore" \
+            --exclude "assets/README.txt" \
+            --exclude "Jeffrin's Resume.pdf"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --paths "/*"

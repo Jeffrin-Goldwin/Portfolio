@@ -1,0 +1,18 @@
+{
+  "name": "portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal developer portfolio — static site bundled with esbuild.",
+  "scripts": {
+    "build": "esbuild src/App.jsx --bundle --format=esm --minify --define:process.env.NODE_ENV='\"production\"' --external:@data --outfile=src/app.bundle.js"
+  },
+  "dependencies": {
+    "framer-motion": "11.3.24",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.2"
+  }
+}

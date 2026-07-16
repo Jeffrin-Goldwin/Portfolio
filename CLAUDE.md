@@ -6,7 +6,8 @@ Personal developer portfolio, hosted as static files on **AWS S3**.
 - The machine has **no Node, npm, or Python** (only `winget`). Do **not** suggest `npm install` / Vite dev-server steps. The build uses a **standalone `esbuild.exe`** that `build.ps1` self-downloads (no Node runtime).
 - **Content edits (`src/data.js`) need NO build** — edit, re-upload to S3, invalidate CloudFront. `data.js` loads at runtime via the `@data` import-map entry (kept external from the bundle).
 - **`src/App.jsx` is bundled to `src/app.bundle.js`** — esbuild inlines React, ReactDOM and Framer Motion into one minified file (~270 KB / ~87 KB gzipped). The page loads only that bundle + `data.js`: **no esm.sh, no CDN modules, no in-browser Babel.** This was done to kill a 50+ request esm.sh waterfall that made first load slow.
-- After editing `App.jsx`, regenerate the bundle: `powershell -ExecutionPolicy Bypass -File .\build.ps1` (fetches `esbuild.exe` + the library tarballs on first run; still no Node/npm). **`app.bundle.js` is generated — never hand-edit it.**
+- After editing `App.jsx`, regenerate the bundle: `powershell -ExecutionPolicy Bypass -File .\build.ps1` (fetches `esbuild.exe` + the library tarballs on first run; still no Node/npm). **`app.bundle.js` is generated — never hand-edit it, and it is NOT committed** (git-ignored). CI rebuilds it on deploy; `build.ps1` builds it locally for `serve.ps1` preview.
+- **`package.json`** exists only so CI (Node-based GitHub runner) can `npm install` + `npm run build` — it mirrors the same esbuild command/versions as `build.ps1`. The local machine still never runs npm.
 
 ## Layout
 ```
@@ -16,11 +17,13 @@ serve.ps1       zero-install local preview (PowerShell HTTP server, port 8000)
 build.ps1       bundle App.jsx (+React/Framer) -> app.bundle.js (self-fetches esbuild + libs; no Node)
 src/data.js     ★ all content: profile, skills, socials, projects/experience, certifications, posts
 src/App.jsx     the whole React app + Framer Motion (SINGLE source file — see gotcha)
-src/app.bundle.js  GENERATED from App.jsx by build.ps1 — do not hand-edit; this is what the page loads
+src/app.bundle.js  GENERATED from App.jsx (build.ps1 / CI) — git-ignored; do not hand-edit; the page loads this
 src/styles.css  theme; all colors are CSS vars in :root at the top
+package.json    deps + build script for CI only (local machine never runs npm)
+.github/        GitHub Actions CI/CD (deploy.yml) + AWS_OIDC_SETUP.md
 assets/         profile.jpg + resume.pdf go here
 .tools/         cached esbuild.exe (created by build.ps1; git-ignored / don't upload)
-node_modules/   cached library tarballs for bundling (created by build.ps1; git-ignored / don't upload)
+node_modules/   cached libs for bundling (created by build.ps1 / npm; git-ignored / don't upload)
 ```
 
 ## Gotchas / conventions
@@ -38,9 +41,15 @@ node_modules/   cached library tarballs for bundling (created by build.ps1; git-
 - **Tone: confident, not needy.** No "available for hire" / "open to opportunities" / "looking for work" language anywhere.
 
 ## Deploy
-S3 static website hosting; upload the folder (exclude `serve.ps1`, `README.md`, `.git`). CloudFront recommended for HTTPS/custom domain. Full steps in `README.md`.
+**Primary: CI/CD via GitHub Actions** (`.github/workflows/deploy.yml`). Push to `main` → CI builds
+the bundle (fails on build error) → CD assumes an AWS IAM role via **OIDC** (no stored keys), runs
+`aws s3 sync --delete`, and invalidates CloudFront. PRs run CI only. One-time AWS/GitHub setup is in
+`.github/AWS_OIDC_SETUP.md`; the role ARN / region / bucket / distribution live in GitHub
+secrets+variables, not in the repo.
+
+**Manual fallback** (if ever needed) — S3 static hosting behind CloudFront:
 ```
-aws s3 sync . s3://YOUR-BUCKET --exclude "serve.ps1" --exclude "build.ps1" --exclude ".tools/*" --exclude "node_modules/*" --exclude "src/App.jsx" --exclude "README.md" --exclude ".git/*"
+aws s3 sync . s3://YOUR-BUCKET --exclude "serve.ps1" --exclude "build.ps1" --exclude ".tools/*" --exclude "node_modules/*" --exclude "src/App.jsx" --exclude "*.md" --exclude "package.json" --exclude ".github/*" --exclude ".git/*"
 aws cloudfront create-invalidation --distribution-id YOUR_DIST_ID --paths "/*"
 ```
 Every deploy needs the CloudFront invalidation, or edge caches keep serving old files.

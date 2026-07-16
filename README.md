@@ -13,7 +13,7 @@ Portfolio/
 ├─ src/
 │  ├─ data.js        ← ★ EDIT THIS: your name, bio, experience, certs, blog posts
 │  ├─ App.jsx        ← the React app + all Framer Motion animations (source)
-│  ├─ app.bundle.js  ← GENERATED from App.jsx by build.ps1 — the page loads this; don't hand-edit
+│  ├─ app.bundle.js  ← GENERATED from App.jsx (build.ps1 / CI) — the page loads this; not committed
 │  └─ styles.css     ← theme + layout (colors live in the :root block at the top)
 └─ assets/
    ├─ profile.jpg    ← add your photo here (see assets/README.txt)
@@ -94,6 +94,21 @@ aws s3 sync . s3://YOUR-BUCKET --exclude "serve.ps1" --exclude "build.ps1" --exc
 For HTTPS, a custom domain, and caching, create a **CloudFront** distribution with the S3 bucket
 as origin (set the default root object to `index.html`). This also lets you keep the bucket private
 via Origin Access Control.
+
+## Continuous deployment (GitHub Actions)
+
+Pushing to `main` deploys automatically — no manual `aws s3 sync`:
+
+- **CI (Build)** — runs on every push and pull request; builds the bundle and fails the check on any
+  build error.
+- **CD (Deploy)** — runs only on push to `main`; authenticates to AWS with short-lived **OIDC**
+  credentials (no stored keys), `aws s3 sync`s the site, and invalidates CloudFront.
+
+Workflow: `.github/workflows/deploy.yml`. **One-time AWS + GitHub setup:
+[`.github/AWS_OIDC_SETUP.md`](.github/AWS_OIDC_SETUP.md)** (create the OIDC provider, an IAM role,
+the `production` environment, and four repo secrets/variables). After that, editing content is just:
+edit `src/data.js` → commit → push. The bundle is rebuilt by CI, so you don't even need to run
+`build.ps1` before pushing (that's only for local preview).
 
 ## Updating later
 Edit `src/data.js` (content), re-run the S3 upload — no rebuild. If you changed `src/App.jsx`,
