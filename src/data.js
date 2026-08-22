@@ -100,6 +100,12 @@ export const projects = [
 // ---------------------------------------------------------------------------
 export const certifications = [
   {
+    title: "HashiCorp Certified: Terraform Associate",
+    issuer: "HashiCorp",
+    date: "",
+    credential: null,
+  },
+  {
     title: "AWS Certified Cloud Practitioner",
     issuer: "Amazon Web Services",
     date: "",
