@@ -51,9 +51,9 @@ export const socials = [
 //  `description` is the summary always shown on the card. `highlights` is the
 //  bullet list revealed when the card is expanded — omit it and the card
 //  simply isn't expandable.
-//  When you have public repos to show, add `repo` / `demo` URLs to a card.
+//  `repo` / `demo` URLs are optional icon links in the card's corner.
 // ---------------------------------------------------------------------------
-export const projects = [
+export const experience = [
   {
     title: "Senior Software Engineer",
     org: "JMAN Group",
@@ -114,16 +114,24 @@ export const certifications = [
 ];
 
 // ---------------------------------------------------------------------------
-//  BLOG  (link out to Medium/Dev.to/your own posts)
+//  PROJECTS  (personal / open-source work — shown under the "Projects" section)
+//  Same shape as experience cards: `description` always shows, `highlights`
+//  expand on click, `repo` / `demo` add icon links. `org` / `period` optional.
 // ---------------------------------------------------------------------------
-export const posts = [
+export const projects = [
   {
-    title: "Terraform modules that scale across teams",
-    excerpt:
-      "A practical look at structuring reusable Terraform modules for multi-account, multi-cloud environments — without the copy-paste sprawl.",
-    date: "2026-06-01",
-    readingTime: "7 min read",
-    href: "#", // placeholder — swap for your real post URL
-    tag: "Infrastructure",
+    title: "Log Analyzer",
+    description:
+      "A Bash CLI that parses nginx access logs (combined format) and prints a quick traffic summary — request counts, unique IPs, top IPs and paths, 404 hot spots, and a per-hour histogram drawn right in the terminal.",
+    highlights: [
+      "Reports total requests, unique IPs, 2xx / 4xx counts, top N IPs, top N paths and top N 404 paths using standard Unix tools (awk, sort, uniq).",
+      "Renders requests-per-hour as a # bar chart for spotting spikes at a glance.",
+      "Supports filtering to a single status class (2xx / 3xx / 4xx / 5xx) and configurable top-N via CLI flags.",
+      "Ships with a Python generator that produces realistic fake nginx logs — heavy-hitter IPs, scanner probes, request bursts and a 5xx incident window — with seeded, reproducible output.",
+    ],
+    tags: ["Bash", "awk", "nginx", "Python", "CLI"],
+    repo: "https://github.com/Jeffrin-Goldwin/Log-Analyzer",
+    demo: null,
+    featured: false,
   },
 ];

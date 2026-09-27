@@ -11,7 +11,7 @@ Portfolio/
 ├─ serve.ps1         ← zero-install local preview server (PowerShell)
 ├─ build.ps1         ← bundle App.jsx (+React/Framer) → app.bundle.js (only for app changes)
 ├─ src/
-│  ├─ data.js        ← ★ EDIT THIS: your name, bio, experience, certs, blog posts
+│  ├─ data.js        ← ★ EDIT THIS: your name, bio, experience, certs, projects
 │  ├─ App.jsx        ← the React app + all Framer Motion animations (source)
 │  ├─ app.bundle.js  ← GENERATED from App.jsx (build.ps1 / CI) — the page loads this; not committed
 │  └─ styles.css     ← theme + layout (colors live in the :root block at the top)
@@ -23,7 +23,7 @@ Portfolio/
 ## Make it yours (2 minutes)
 
 1. **Content** — open `src/data.js` and replace the placeholders: name, role, tagline, bio,
-   `socials`, `projects`, `certifications`, and `posts`. The comments explain each field.
+   `socials`, `experience`, `certifications`, and `projects`. The comments explain each field.
 2. **Photo** — drop a square image at `assets/profile.jpg`. No photo? A gradient monogram of
    your initials shows automatically.
 3. **Resume** — drop `assets/resume.pdf` (or set `resume: null` in `data.js` to hide the button).

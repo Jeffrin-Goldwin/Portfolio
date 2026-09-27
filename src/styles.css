@@ -251,11 +251,10 @@ section { padding: 96px 0; position: relative; }
 .grid { display: grid; gap: 20px; }
 /* Experience reads as a chronological list, so one full-width column per role —
    a 2-col grid left a lone trailing card stranded at half width. */
-.grid.projects { grid-template-columns: 1fr; }
+.grid.experience, .grid.projects { grid-template-columns: 1fr; }
 /* auto-fit so a short list sits left-aligned at a natural card size rather than
    stretching or stranding cards in empty columns */
 .grid.certs { grid-template-columns: repeat(auto-fit, minmax(280px, 320px)); }
-.grid.blog { grid-template-columns: repeat(3, 1fr); }
 
 .card {
   position: relative; border: 1px solid var(--border); background: var(--surface);
@@ -317,13 +316,6 @@ section { padding: 96px 0; position: relative; }
 .cert-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; font-size: 0.88rem; color: var(--accent-ink); font-weight: 600; }
 .cert-link:hover { text-decoration: underline; }
 
-/* blog cards */
-.blog-card { display: flex; flex-direction: column; }
-.blog-meta { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; color: var(--faint); font-family: var(--mono); margin-bottom: 12px; }
-.blog-tag { color: var(--accent-ink); }
-.blog-card .arrow { margin-top: auto; padding-top: 18px; color: var(--accent-ink); font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; transition: gap 0.2s; }
-.blog-card:hover .arrow { gap: 12px; }
-
 /* ---------- Contact / footer ------------------------------------------------ */
 .contact { text-align: center; }
 .contact-card {
@@ -346,11 +338,10 @@ footer { border-top: 1px solid var(--border); padding: 30px 0; }
   .avatar-wrap { order: -1; }
   .about-grid { grid-template-columns: 1fr; }
   /* .grid.certs is auto-fit and handles this range itself */
-  .grid.blog { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 640px) {
   section { padding: 72px 0; }
-  .grid.projects, .grid.certs, .grid.blog { grid-template-columns: 1fr; }
+  .grid.certs { grid-template-columns: 1fr; }
   .card.span-2 { grid-column: span 1; }
   .hero-actions { width: 100%; }
   .hero-actions .btn { flex: 1; justify-content: center; }

@@ -5,9 +5,9 @@ import {
   profile,
   skills,
   socials,
+  experience,
   projects,
   certifications,
-  posts,
 } from "@data"; // mapped to ./src/data.js via the import map in index.html
 
 /* ------------------------------------------------------------------ icons -- */
@@ -143,9 +143,9 @@ const SectionHead = ({ n, label, title, subtitle }) => (
 /* ----------------------------------------------------------------- nav ----- */
 const NAV = [
   ["About", "#about"],
-  ["Experience", "#projects"],
+  ["Experience", "#experience"],
   ["Certs", "#certifications"],
-  ["Blog", "#blog"],
+  ["Projects", "#projects"],
 ];
 
 function Nav() {
@@ -231,7 +231,7 @@ function Hero() {
           <motion.div className="role" variants={fadeUp}>{profile.role}</motion.div>
           <motion.p className="tagline" variants={fadeUp}>{profile.tagline}</motion.p>
           <motion.div className="hero-actions" variants={fadeUp}>
-            <a className="btn btn-primary" href="#projects">View my work <Icon name="arrow" /></a>
+            <a className="btn btn-primary" href="#experience">View my work <Icon name="arrow" /></a>
             {profile.resume && (
               <a className="btn btn-ghost" href={profile.resume} target="_blank" rel="noreferrer">
                 Résumé <Icon name="external" size={16} />
@@ -294,8 +294,8 @@ function About() {
   );
 }
 
-/* ------------------------------------------------------------- projects ---- */
-function ExperienceCard({ p }) {
+/* ----------------------------------------------------------- experience ---- */
+function ExperienceCard({ p, toggleLabel = "What I did here" }) {
   const [open, setOpen] = useState(false);
   const expandable = Array.isArray(p.highlights) && p.highlights.length > 0;
 
@@ -349,7 +349,7 @@ function ExperienceCard({ p }) {
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
           >
-            <span>{open ? "Hide details" : "What I did here"}</span>
+            <span>{open ? "Hide details" : toggleLabel}</span>
             <motion.span
               className="exp-chevron"
               animate={{ rotate: open ? 180 : 0 }}
@@ -368,9 +368,9 @@ function ExperienceCard({ p }) {
   );
 }
 
-function Projects() {
+function Experience() {
   return (
-    <section id="projects">
+    <section id="experience">
       <div className="container">
         <SectionHead
           n="02"
@@ -379,13 +379,13 @@ function Projects() {
           subtitle="Roles where I've designed, shipped, and secured systems end to end."
         />
         <motion.div
-          className="grid projects"
+          className="grid experience"
           variants={container}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.1 }}
         >
-          {projects.map((p) => <ExperienceCard key={p.title} p={p} />)}
+          {experience.map((p) => <ExperienceCard key={p.title} p={p} />)}
         </motion.div>
       </div>
     </section>
@@ -427,48 +427,25 @@ function Certifications() {
   );
 }
 
-/* ----------------------------------------------------------------- blog ---- */
-function Blog() {
-  const fmt = (d) => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+/* ------------------------------------------------------------- projects ---- */
+function Projects() {
   return (
-    <section id="blog">
+    <section id="projects">
       <div className="container">
         <SectionHead
           n="04"
-          label="blog"
-          title="Writing & notes"
-          subtitle="I write about performance, architecture, and the craft of building software."
+          label="projects"
+          title="Things I've built"
+          subtitle="Side projects and tools, with source on GitHub."
         />
         <motion.div
-          className="grid blog"
+          className="grid projects"
           variants={container}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.1 }}
         >
-          {posts.map((post) => (
-            <motion.a
-              key={post.title}
-              className="card blog-card"
-              href={post.href}
-              target="_blank"
-              rel="noreferrer"
-              variants={fadeUp}
-              whileHover={{ y: -6 }}
-              transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            >
-              <div className="blog-meta">
-                <span className="blog-tag">{post.tag}</span>
-                <span>·</span>
-                <span>{fmt(post.date)}</span>
-                <span>·</span>
-                <span>{post.readingTime}</span>
-              </div>
-              <h3 style={{ fontSize: "1.14rem" }}>{post.title}</h3>
-              <p>{post.excerpt}</p>
-              <span className="arrow">Read post <Icon name="arrow" size={16} /></span>
-            </motion.a>
-          ))}
+          {projects.map((p) => <ExperienceCard key={p.title} p={p} toggleLabel="How it works" />)}
         </motion.div>
       </div>
     </section>
@@ -577,9 +554,9 @@ function App() {
       <main>
         <Hero />
         <About />
-        <Projects />
+        <Experience />
         <Certifications />
-        <Blog />
+        <Projects />
         <Contact />
       </main>
       <Footer />
