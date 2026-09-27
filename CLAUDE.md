@@ -15,7 +15,7 @@ index.html      page shell, SEO meta, import map (versions pinned here)
 favicon.svg     gradient </> mark (no background)
 serve.ps1       zero-install local preview (PowerShell HTTP server, port 8000)
 build.ps1       bundle App.jsx (+React/Framer) -> app.bundle.js (self-fetches esbuild + libs; no Node)
-src/data.js     ★ all content: profile, skills, socials, projects/experience, certifications, posts
+src/data.js     ★ all content: profile, skills, socials, experience, certifications, projects
 src/App.jsx     the whole React app + Framer Motion (SINGLE source file — see gotcha)
 src/app.bundle.js  GENERATED from App.jsx (build.ps1 / CI) — git-ignored; do not hand-edit; the page loads this
 src/styles.css  theme; all colors are CSS vars in :root at the top
